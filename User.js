@@ -1,9 +1,11 @@
+const TodoList = require('./TodoList');
+
 class User{
     constructor(email, lastname, firstname, birthday, password){
         this.email = email
         this.lastname = lastname
         this.firstname = firstname
-        this.birthday = birthday
+        this.birthday = new Date(birthday)
         this.password = password
         this.todoList = null
     }
@@ -25,7 +27,7 @@ class User{
 
     createToDoList() {
         if (this.isValid() && !this.todoList) {
-          this.todoList = new ToDoList();
+          this.todoList = new TodoList();
           return true;
         }
         return false;
