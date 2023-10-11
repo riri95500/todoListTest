@@ -1,41 +1,45 @@
 const Item = require("./Item");
+const User = require("./User");
 
 class ToDoList {
-    constructor() {
-      this.items = [];
+    constructor(user) {
+        this.items = [];
+        this.user = user;
     }
 
     addItem(item) {
         if (item instanceof Item) {
-          if (this.itemValid(item)) {
-              this.items.push(item);
-              return true;
-          }
+            if (this.itemValid(item)) {
+                this.items.push(item);
+                return true;
+            }
         }
         return false;
     }
 
     itemValid(item) {
-        if (item instanceof Item) {
-          if (this.items.length >= 10) {
-            return false; // Ne peut pas ajouter plus de 10 items.
-          }
-
-          const lastItem = this.items[this.items.length - 1];
-          let timeDifference = null;
-          if (!lastItem) {
-            return true;
-          }
-          else {
-            timeDifference = item.creationDate - lastItem.creationDate;
-          }
-          const minutesBetweenItems = Math.floor(timeDifference / (1000 * 60));
-
-          return minutesBetweenItems >= 30;
+        if (
+            this.user.isValid() === false ||
+            !(item instanceof Item) ||
+            item.name === "" ||
+            item.content === "" ||
+            item.content.length > 1000 ||
+            this.items.length >= 10
+        ) {
+            return false;
         }
 
-        return false;
-      }
-  }
+        const lastItem = this.items[this.items.length - 1];
 
-  module.exports = ToDoList;
+        if (!lastItem) {
+            return true;
+        }
+
+        const timeDifference = item.creationDate - lastItem.creationDate;
+        const minutesBetweenItems = Math.floor(timeDifference / (1000 * 60));
+
+        return minutesBetweenItems >= 30 && !this.items.some(itemInList => itemInList.name === item.name);
+    }
+}
+
+module.exports = ToDoList;
