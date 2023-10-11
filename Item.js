@@ -1,8 +1,12 @@
 class Item {
-    constructor(name, content, userId){
+    name = ""
+    content = ""
+    creationDate = null
+
+    constructor(name, content) {
         this.name = name
         this.content = content
-        this.userId = userId
+        this.creationDate = new Date()
     }
 }
 
