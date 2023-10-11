@@ -1,19 +1,22 @@
 const TodoList = require('./TodoList')
 const Item = require('./Item')
 const User = require("./User");
+const EmailService = require("./EmailService");
 jest.useFakeTimers();
 
 describe('Tests pour la classe TodoList', () => {
+
     test('Erreur utilisateur non valide', () => {
         const user = new User("r.benchouche@test.com", "Test", "Riad", "2001-06-30", "Password");
-        const todoList = new TodoList(user);
+        emailService = new EmailService();
+        const todoList = new TodoList(user, emailService);
         expect(todoList.addItem(new Item("Lundi", "Promener le chien"))).toBe(false);
     });
-
-    let user, todoList;
+    let user, todoList, emailService;
     beforeEach(() => {
         user = new User("r.benchouche@test.com", "Test", "Riad", "2001-06-30", "Password123");
-        todoList = new TodoList(user);
+        emailService = new EmailService();
+        todoList = new TodoList(user, emailService);
     });
 
     test('Success ajout item TodoList', () => {
@@ -68,6 +71,31 @@ describe('Tests pour la classe TodoList', () => {
     test('Erreur ajout item TodoList (Description trop longue)', () => {
         const item = new Item("Mardi", "Acheter des fruits".repeat(1000));
         expect(todoList.addItem(item)).toBe(false);
+    });
+
+    test('Test envoi de mail (8 items) avec comme résultat attendu un appel à la méthode sendEmail', () => {
+        todoList.sender.sendEmail = jest.fn();
+        for (let i = 0; i < 8; i++) {
+            jest.advanceTimersByTime(1000 * 60 * 30);
+            todoList.addItem(new Item("Jour " + i, "Description " + i));
+        }
+
+        expect(todoList.sender.sendEmail).toHaveBeenCalledWith(user, "Vous avez atteint 8 items dans votre liste de tâches");
+    });
+
+    test('Test envoi de mail (8 items) ', () => {
+        todoList.sender.sendEmail = jest.fn();
+
+        // Modifiez le comportement du mock
+        todoList.sender.sendEmail.mockReturnValue(true);
+
+        for (let i = 0; i < 8; i++) {
+            jest.advanceTimersByTime(1000 * 60 * 30);
+            todoList.addItem(new Item("Jour " + i, "Description " + i));
+        }
+
+        // Vérifiez si la méthode a été appelée
+        expect(todoList.sender.sendEmail).toHaveBeenCalled();
     });
 });
 

@@ -1,16 +1,20 @@
 const Item = require("./Item");
-const User = require("./User");
+const EmailService = require("./EmailService");
 
 class ToDoList {
-    constructor(user) {
+    constructor(user, sender) {
         this.items = [];
         this.user = user;
+        this.sender = sender || new EmailService();
     }
 
     addItem(item) {
         if (item instanceof Item) {
             if (this.itemValid(item)) {
                 this.items.push(item);
+                if (this.items.length === 8) {
+                    this.sender.sendEmail(this.user, "Vous avez atteint 8 items dans votre liste de tâches");
+                }
                 return true;
             }
         }
