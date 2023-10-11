@@ -25,6 +25,11 @@ describe('Tests pour la classe TodoList', () => {
     });
 
     test('Erreur ajout item TodoList (Plus de 10 items)', () => {
+        todoList.sender.sendEmail = jest.fn(
+            (user, content) => {
+                console.log("Email sent to " + user.email + " with content : " + content);
+            }
+        );
         for (let i = 0; i < 10; i++) {
             jest.advanceTimersByTime(1000 * 60 * 30);
             todoList.addItem(new Item("Jour " + i, "Description " + i));
@@ -74,28 +79,17 @@ describe('Tests pour la classe TodoList', () => {
     });
 
     test('Test envoi de mail (8 items) avec comme résultat attendu un appel à la méthode sendEmail', () => {
-        todoList.sender.sendEmail = jest.fn();
+        todoList.sender.sendEmail = jest.fn(
+            (user, content) => {
+                console.log("Email sent to " + user.email + " with content : " + content);
+            }
+        );
         for (let i = 0; i < 8; i++) {
             jest.advanceTimersByTime(1000 * 60 * 30);
             todoList.addItem(new Item("Jour " + i, "Description " + i));
         }
 
         expect(todoList.sender.sendEmail).toHaveBeenCalledWith(user, "Vous avez atteint 8 items dans votre liste de tâches");
-    });
-
-    test('Test envoi de mail (8 items) ', () => {
-        todoList.sender.sendEmail = jest.fn();
-
-        // Modifiez le comportement du mock
-        todoList.sender.sendEmail.mockReturnValue(true);
-
-        for (let i = 0; i < 8; i++) {
-            jest.advanceTimersByTime(1000 * 60 * 30);
-            todoList.addItem(new Item("Jour " + i, "Description " + i));
-        }
-
-        // Vérifiez si la méthode a été appelée
-        expect(todoList.sender.sendEmail).toHaveBeenCalled();
     });
 });
 
